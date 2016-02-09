@@ -8,14 +8,15 @@ var User = db.Model.extend({
   password: '',
   initialize: function(){
     this.on('creating', function(model, attrs, op){
-      bcrypt.hash(model.get('password'), null, null, function(err, hash){
-        model.set('password', hash);
-
-        console.log('model is ' + model.password);
-        console.log('hash is ' + hash);
+      return new Promise(function(resolve, reject){
+        bcrypt.hash(model.get('password'), null, null, function(err, hash){
+          if(err){reject(err);}
+          model.set('password', hash);
+          resolve(hash);
+        });
       });
-    })
-  },
+    });
+  }
 });
 
 module.exports = User;

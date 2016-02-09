@@ -4,7 +4,6 @@ var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 
-
 var db = require('./app/config');
 var Users = require('./app/collections/users');
 var User = require('./app/models/user');
@@ -14,18 +13,19 @@ var Click = require('./app/models/click');
 
 var app = express();
 
-var loggedIn = false;
-
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+// Plug in middleware... ///////////////////
 app.use(partials());
 
 // Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
+// Set root directory for express app
 app.use(express.static(__dirname + '/public'));
+// Add session
 app.use(session({
   secret: 'keyboard cat',
   cookie: {
@@ -33,9 +33,9 @@ app.use(session({
   }
 }));
 
+// Check for auth before every response
 app.use(function (req, res, next) {
-  // check for auth before every response
-  if(!loggedIn){ // change to detect auth
+  if(req.path !== '/login'){ // change to detect auth
     res.redirect('login');
   }
   next();
@@ -105,11 +105,12 @@ app.post('/login', function(request, response) {
 
     var username = request.body.username;
     var password = request.body.password;
+
     console.log("USER :", username);
-    console.log("PW :", password)
+    console.log("PW :", password);
+
     if(username == 'demo' && password == 'demo'){
       console.log("Logged in!");
-      loggedIn = true;
       response.redirect('/index');
     }
     else {

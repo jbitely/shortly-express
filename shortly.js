@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 
 
 var db = require('./app/config');
@@ -13,6 +14,8 @@ var Click = require('./app/models/click');
 
 var app = express();
 
+var loggedIn = false;
+
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
@@ -23,10 +26,16 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+app.use(session({
+  secret: 'keyboard cat',
+  cookie: {
+    maxAge: 60000
+  }
+}));
 
 app.use(function (req, res, next) {
   // check for auth before every response
-  if(req.path !== '/login'){
+  if(!loggedIn){ // change to detect auth
     res.redirect('login');
   }
   next();
@@ -92,10 +101,32 @@ function(req, res) {
   res.render('login');
 });
 
+app.post('/login', function(request, response) {
+
+    var username = request.body.username;
+    var password = request.body.password;
+    console.log("USER :", username);
+    console.log("PW :", password)
+    if(username == 'demo' && password == 'demo'){
+      console.log("Logged in!");
+      loggedIn = true;
+      response.redirect('/index');
+    }
+    else {
+       res.redirect('login');
+    }
+});
+
 app.get('/signup',
 function(req, res) {
   res.render('signup');
 });
+
+// Submit credentials
+// app.post('/signup',
+// function(req, res) {
+//   res.render('login');
+// });
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail

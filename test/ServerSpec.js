@@ -60,7 +60,7 @@ describe('', function() {
   });
 
 // Link Creation /////////////////////////////////////////////////
-  xdescribe('Link creation:', function(){
+  describe('Link creation:', function(){
 
     var requestWithSession = request.defaults({jar: true});
 
@@ -281,8 +281,6 @@ describe('', function() {
       };
 
       request(options, function(error, res, body) {
-        console.log("SERVERSPEC RESPONSE RECEIVED:")
-        console.log(res.headers);
         expect(res.headers.location).to.equal('/');
         done();
       });
@@ -292,7 +290,7 @@ describe('', function() {
 
 
 // Account Login /////////////////////////////////////////////////
-  xdescribe('Account Login:', function(){
+  describe('Account Login:', function(){
 
     var requestWithSession = request.defaults({jar: true});
 
